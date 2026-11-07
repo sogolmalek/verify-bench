@@ -1,0 +1,245 @@
+{
+ "note": "Held out of the sample. The labels here are for choosing the probe winner, and no verifier sees them.",
+ "prs": [
+  {
+   "agent": "Copilot coding agent",
+   "repo": "github/gh-aw",
+   "number": 61439,
+   "state": "merged",
+   "lines": 188,
+   "heldOutAs": "clean"
+  },
+  {
+   "agent": "Copilot coding agent",
+   "repo": "biolink/biolink-model",
+   "number": 1816,
+   "state": "merged",
+   "lines": 13,
+   "heldOutAs": "clean"
+  },
+  {
+   "agent": "Copilot coding agent",
+   "repo": "mikefarah/yq",
+   "number": 2886,
+   "state": "merged",
+   "lines": 207,
+   "heldOutAs": "clean"
+  },
+  {
+   "agent": "Copilot coding agent",
+   "repo": "github/gh-aw",
+   "number": 61423,
+   "state": "merged",
+   "lines": 153,
+   "heldOutAs": "clean"
+  },
+  {
+   "agent": "Copilot coding agent",
+   "repo": "custom-components/ble_monitor",
+   "number": 1598,
+   "state": "closed",
+   "lines": 7,
+   "heldOutAs": "not-clean"
+  },
+  {
+   "agent": "Copilot coding agent",
+   "repo": "sbroenne/mcp-server-excel",
+   "number": 895,
+   "state": "merged",
+   "lines": 463,
+   "heldOutAs": "not-clean"
+  },
+  {
+   "agent": "Copilot coding agent",
+   "repo": "dotnet/roslyn",
+   "number": 85761,
+   "state": "closed",
+   "lines": 293,
+   "heldOutAs": "not-clean"
+  },
+  {
+   "agent": "Copilot coding agent",
+   "repo": "open-telemetry/opentelemetry-java-instrumentation",
+   "number": 20069,
+   "state": "closed",
+   "lines": 505,
+   "heldOutAs": "not-clean"
+  },
+  {
+   "agent": "Claude (GitHub app)",
+   "repo": "aio-libs/aiobotocore",
+   "number": 1765,
+   "state": "merged",
+   "lines": 20,
+   "heldOutAs": "clean"
+  },
+  {
+   "agent": "Claude (GitHub app)",
+   "repo": "freelensapp/freelens",
+   "number": 2526,
+   "state": "merged",
+   "lines": 36,
+   "heldOutAs": "clean"
+  },
+  {
+   "agent": "Claude (GitHub app)",
+   "repo": "Comfy-Org/ComfyUI_frontend",
+   "number": 20466,
+   "state": "merged",
+   "lines": 710,
+   "heldOutAs": "clean"
+  },
+  {
+   "agent": "Claude (GitHub app)",
+   "repo": "mwmbl/mwmbl",
+   "number": 405,
+   "state": "merged",
+   "lines": 29,
+   "heldOutAs": "clean"
+  },
+  {
+   "agent": "Claude (GitHub app)",
+   "repo": "sourcebot-dev/sourcebot",
+   "number": 1639,
+   "state": "closed",
+   "lines": 327,
+   "heldOutAs": "not-clean"
+  },
+  {
+   "agent": "Claude (GitHub app)",
+   "repo": "Infisical/infisical",
+   "number": 8070,
+   "state": "merged",
+   "lines": 437,
+   "heldOutAs": "not-clean"
+  },
+  {
+   "agent": "Claude (GitHub app)",
+   "repo": "electron/electron",
+   "number": 54013,
+   "state": "merged",
+   "lines": 142,
+   "heldOutAs": "not-clean"
+  },
+  {
+   "agent": "Claude (GitHub app)",
+   "repo": "Comfy-Org/ComfyUI_frontend",
+   "number": 17215,
+   "state": "closed",
+   "lines": 122,
+   "heldOutAs": "not-clean"
+  },
+  {
+   "agent": "Devin",
+   "repo": "airbytehq/airbyte",
+   "number": 85800,
+   "state": "merged",
+   "lines": 188,
+   "heldOutAs": "clean"
+  },
+  {
+   "agent": "Devin",
+   "repo": "BerriAI/litellm",
+   "number": 41507,
+   "state": "merged",
+   "lines": 281,
+   "heldOutAs": "clean"
+  },
+  {
+   "agent": "Devin",
+   "repo": "airbytehq/airbyte",
+   "number": 85793,
+   "state": "merged",
+   "lines": 11,
+   "heldOutAs": "clean"
+  },
+  {
+   "agent": "Devin",
+   "repo": "pokanop/nostromo",
+   "number": 80,
+   "state": "merged",
+   "lines": 46,
+   "heldOutAs": "clean"
+  },
+  {
+   "agent": "Devin",
+   "repo": "s2-streamstore/s2",
+   "number": 729,
+   "state": "merged",
+   "lines": 147,
+   "heldOutAs": "not-clean"
+  },
+  {
+   "agent": "Devin",
+   "repo": "BerriAI/litellm",
+   "number": 42824,
+   "state": "merged",
+   "lines": 793,
+   "heldOutAs": "not-clean"
+  },
+  {
+   "agent": "Devin",
+   "repo": "alphaXiv/OpenResearch",
+   "number": 736,
+   "state": "closed",
+   "lines": 198,
+   "heldOutAs": "not-clean"
+  },
+  {
+   "agent": "Cursor (GitHub app)",
+   "repo": "NVIDIA/elements",
+   "number": 339,
+   "state": "merged",
+   "lines": 132,
+   "heldOutAs": "clean"
+  },
+  {
+   "agent": "Cursor (GitHub app)",
+   "repo": "openenv/OpenEnv",
+   "number": 1141,
+   "state": "merged",
+   "lines": 335,
+   "heldOutAs": "clean"
+  },
+  {
+   "agent": "Cursor (GitHub app)",
+   "repo": "firecrawl/firecrawl",
+   "number": 4875,
+   "state": "merged",
+   "lines": 106,
+   "heldOutAs": "clean"
+  },
+  {
+   "agent": "Cursor (GitHub app)",
+   "repo": "mattermost/mattermost",
+   "number": 38568,
+   "state": "merged",
+   "lines": 112,
+   "heldOutAs": "clean"
+  },
+  {
+   "agent": "Cursor (GitHub app)",
+   "repo": "openenv/OpenEnv",
+   "number": 1182,
+   "state": "closed",
+   "lines": 611,
+   "heldOutAs": "not-clean"
+  },
+  {
+   "agent": "Cursor (GitHub app)",
+   "repo": "koala73/worldmonitor",
+   "number": 8225,
+   "state": "closed",
+   "lines": 47,
+   "heldOutAs": "not-clean"
+  },
+  {
+   "agent": "Cursor (GitHub app)",
+   "repo": "getsentry/sentry",
+   "number": 126782,
+   "state": "closed",
+   "lines": 199,
+   "heldOutAs": "not-clean"
+  }
+ ]
+}

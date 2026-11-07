@@ -1,0 +1,41 @@
+# Runs only when its owner starts it. Never on a pull request or a fork. Every action is pinned to a commit.
+name: bench
+on:
+  workflow_dispatch:
+    inputs:
+      run:
+        description: 'test, or probe'
+        required: true
+        default: test
+        type: choice
+        options: [test, probe]
+permissions: {}
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions: { contents: read }
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with: { persist-credentials: false }
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with: { node-version: '24' }
+      - run: npm ci
+      - run: npm test
+  # Holds keys, and needs the owner's approval through the environment. It reads GitHub and calls verifiers. It never runs a repository's code.
+  probe:
+    if: inputs.run == 'probe'
+    needs: test
+    runs-on: ubuntu-latest
+    environment: bench
+    permissions: { contents: read }
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with: { persist-credentials: false }
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with: { node-version: '24' }
+      - run: npm ci
+      - run: npm run probe
+        env:
+          NOSANA_API_KEY: ${{ secrets.NOSANA_API_KEY }}
+          GITHUB_TOKEN: ${{ github.token }}
