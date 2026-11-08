@@ -1,7 +1,7 @@
 /**
  * Cross-file reach for one shard of the sample (src/reach.ts), in Actions with no secrets and no token: each repository is fetched at
  * the patch's base commit, one commit deep, and searched with `git grep`. Nothing in it runs.
- *   REACH_SHARD, REACH_SHARDS (default 0 of 1), REACH_OUT (default results/reach)
+ *   REACH_SHARD, REACH_SHARDS (default 0 of 1), REACH_OUT (default results/reach), REACH_IDS (only these PRs, comma-separated)
  */
 import { spawnSync } from 'node:child_process';
 import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
@@ -22,7 +22,8 @@ const patches = new Map<string, AgentPatch | null>(gunzipSync(readFileSync('task
 // Merged, with a patch; whole repositories per shard, so each is fetched by one job.
 const repos = [...new Set(sample.prs.filter((p) => p.state === 'merged' && patches.get(p.id)).map((p) => p.repo))].sort();
 const mine = new Set(repos.filter((_, i) => i % SHARDS === SHARD));
-const todo = sample.prs.filter((p) => mine.has(p.repo) && p.state === 'merged' && patches.get(p.id) && !done.has(p.id)).sort((a, b) => a.repo.localeCompare(b.repo));
+const only = process.env.REACH_IDS ? new Set(process.env.REACH_IDS.split(',').map((x) => x.trim()).filter(Boolean)) : null;
+const todo = sample.prs.filter((p) => (!only || only.has(p.id)) && mine.has(p.repo) && p.state === 'merged' && patches.get(p.id) && !done.has(p.id)).sort((a, b) => a.repo.localeCompare(b.repo));
 const git = (cwd: string, args: string[], timeout = 600_000) => spawnSync('git', args, { cwd, encoding: 'utf8', maxBuffer: 256 * 1024 * 1024, timeout, env: { PATH: process.env.PATH ?? '', HOME: process.env.HOME ?? '', GIT_TERMINAL_PROMPT: '0' } });
 console.log(JSON.stringify({ shard: SHARD, of: SHARDS, repos: mine.size, prs: todo.length }));
 
@@ -37,14 +38,20 @@ for (const p of todo) {
     appendFileSync(file, `${JSON.stringify({ ...row, sites: 0, files: 0, perName: {} })}\n`);
     continue;
   }
-  if (dirRepo !== p.repo) {
+  const fresh = () => {
     if (dir) rmSync(dir, { recursive: true, force: true });
     dir = mkdtempSync(join(tmpdir(), 'reach-'));
     dirRepo = p.repo;
     git(dir, ['init', '-q']);
     git(dir, ['remote', 'add', 'origin', `https://github.com/${p.repo}.git`]);
+  };
+  if (dirRepo !== p.repo) fresh();
+  let f = git(dir!, ['fetch', '-q', '--depth', '1', '--no-tags', 'origin', a.baseSha]);
+  // A second shallow fetch into the same folder can fail ("shallow file has changed"): once more, in a fresh one.
+  if (f.status !== 0) {
+    fresh();
+    f = git(dir!, ['fetch', '-q', '--depth', '1', '--no-tags', 'origin', a.baseSha]);
   }
-  const f = git(dir!, ['fetch', '-q', '--depth', '1', '--no-tags', 'origin', a.baseSha]);
   if (f.status !== 0) {
     appendFileSync(file, `${JSON.stringify({ ...row, error: `fetch: ${(f.stderr || f.error?.message || '').slice(0, 200)}` })}\n`);
     continue;

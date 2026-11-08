@@ -3,6 +3,8 @@
 name: reach
 on:
   workflow_dispatch:
+    inputs:
+      ids: { description: 'Only these PRs, comma-separated', required: false, default: '' }
 permissions: {}
 jobs:
   reach:
@@ -22,6 +24,7 @@ jobs:
         env:
           REACH_SHARD: ${{ matrix.shard }}
           REACH_SHARDS: '16'
+          REACH_IDS: ${{ inputs.ids }}
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with: { name: 'reach-${{ matrix.shard }}', path: results/reach/, if-no-files-found: warn }
