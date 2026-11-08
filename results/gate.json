@@ -1,0 +1,30 @@
+{
+ "at": "2026-11-08T18:09:50.902Z",
+ "passed": true,
+ "failures": [],
+ "firstVotes": {
+  "qwen3.8:27b": {
+   "votes": 30,
+   "missing": {},
+   "accept": 28,
+   "reject": 2,
+   "secondsPerVote": 46
+  },
+  "glm-4.7-flash": {
+   "votes": 30,
+   "missing": {},
+   "accept": 30,
+   "reject": 0,
+   "secondsPerVote": 15
+  },
+  "devstral": {
+   "votes": 30,
+   "missing": {
+    "no valid decision": 3
+   },
+   "accept": 27,
+   "reject": 0,
+   "secondsPerVote": 8
+  }
+ }
+}
