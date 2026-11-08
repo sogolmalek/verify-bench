@@ -1,0 +1,39 @@
+# The run (PREREGISTRATION.md, amendments 1 and 2): the sample on the three open-weight verifiers, on Nosana. A job lasts at most about
+# 5.5 hours: it stops its deployments, commits its votes, and starts the next run, which resumes. The chain ends at the cap, at the gate,
+# or when every verifier is done. It never runs a PR's code: it reads frozen patches and calls the verifiers.
+name: run
+on:
+  workflow_dispatch:
+permissions: {}
+concurrency: { group: bench-run, cancel-in-progress: false }
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    environment: bench
+    permissions: { contents: write, actions: write }
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with: { node-version: '24' }
+      - run: npm ci
+      - run: npx tsx scripts/run.mts
+        env:
+          NOSANA_API_KEY: ${{ secrets.NOSANA_API_KEY }}
+          GITHUB_TOKEN: ${{ github.token }}
+          RUN_MAX_MINUTES: '320'
+      - name: Commit this job's votes
+        if: always()
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add results/votes.jsonl results/run-log.jsonl results/run-report.json results/run-baseline.json 2>/dev/null || true
+          git diff --cached --quiet || { git commit -m "The run's votes, $(date -u +%FT%H:%MZ)"; git pull --rebase -q; git push; }
+      - name: Hand over to the next job, when this one stopped for time
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          stopped=$(node -e "console.log(JSON.parse(require('fs').readFileSync('results/run-report.json','utf8')).stopped)")
+          echo "stopped: $stopped"
+          if [ "$stopped" = "time" ]; then gh workflow run run.yml --ref "${GITHUB_REF_NAME}"; fi

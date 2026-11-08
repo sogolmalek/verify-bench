@@ -83,6 +83,24 @@ describe('the run, against fakes', () => {
     expect(r.stopped).toMatch(/^the gate: .*missing \(ran out of tokens/);
     expect(state.stopped.size).toBe(state.created);
   }, 120_000);
+  it('hands over at its time limit, and the next job resumes where it stopped', async () => {
+    const { dir, env } = setup(10);
+    await go({ ...env, RUN_MAX_MINUTES: '30' }); // under 40 minutes left: no deployment, hand over
+    expect(report(dir)).toMatchObject({ stopped: 'time', scoredOn: 0 });
+    await go(env);
+    expect(report(dir)).toMatchObject({ stopped: 'done', scoredOn: 10 });
+  }, 120_000);
+  it('reads the frozen patches, the same in every job', async () => {
+    const { gzipSync } = await import('node:zlib');
+    const { dir, env } = setup(3);
+    const patches = join(dir, 'patches.jsonl.gz');
+    const frozen = [1, 2, 3].map((i) => JSON.stringify({ id: `o/r#${i}`, patch: i === 2 ? null : { task: { title: 'frozen', description: '' }, patch: 'diff', agentCommit: 'a', baseSha: 'b', commitsDropped: 0 } })).join('\n');
+    writeFileSync(patches, gzipSync(frozen));
+    const cache = join(dir, 'cache2');
+    mkdirSync(cache);
+    await go({ ...env, RUN_CACHE: cache, RUN_PATCHES: patches });
+    expect(report(dir)).toMatchObject({ stopped: 'done', unreadable: 1, scoredOn: 2 });
+  }, 120_000);
   it("doesn't start a deployment the cap can't cover", async () => {
     const { dir, env } = setup(5);
     await go({ ...env, RUN_CAP_CREDITS: '0.5' });

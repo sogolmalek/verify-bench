@@ -2,10 +2,12 @@
  * The run (the design, approved 2026-11-08): the sample in tasks/sample.json, on the three open-weight verifiers at once, one
  * Nosana deployment each, every one walking the same order. Deployments last 3 hours and are replaced, and the run resumes from the votes
  * already written. It stops at the credit cap, at the gate, or when every verifier is done, and stops every deployment it started.
- *   NOSANA_API_KEY, GITHUB_TOKEN (read-only), RUN_CAP_CREDITS (default 7.879), RUN_OUT (default results)
+ *   NOSANA_API_KEY, GITHUB_TOKEN (read-only), RUN_CAP_CREDITS (default 7.879), RUN_OUT (default results), RUN_MAX_MINUTES (default none:
+ *   in Actions, a job stops in time to save its votes and hand over to the next, which resumes)
  * Gemini isn't here: arm C is 2 of 3 (amendment 2), and its daily side run is scripts/gemini-daily.mts.
  */
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { gunzipSync } from 'node:zlib';
 import { AGENT_VERIFIERS } from '../src/agentPrs.js';
 import { readAgentPatch, type AgentPatch } from '../src/agentPatch.js';
 import { openaiClient } from '../src/clients.js';
@@ -19,7 +21,12 @@ const CAP = Number(process.env.RUN_CAP_CREDITS ?? RUN_CAP_CREDITS);
 const OUT = process.env.RUN_OUT ?? 'results';
 const CACHE = process.env.RUN_CACHE ?? 'cache/patches';
 const SAMPLE = process.env.RUN_SAMPLE ?? 'tasks/sample.json';
+const PATCHES = process.env.RUN_PATCHES ?? 'tasks/patches.jsonl.gz';
 const POLL_MS = Number(process.env.RUN_POLL_MS ?? 20_000);
+const MAX_MS = process.env.RUN_MAX_MINUTES ? Number(process.env.RUN_MAX_MINUTES) * 60_000 : Infinity;
+const RUN_STARTED = Date.now();
+/** Time left in this job: a deployment isn't started that couldn't vote for long, and voting stops at the limit. */
+const timeLeft = () => MAX_MS - (Date.now() - RUN_STARTED);
 const START_WAIT_MS = 25 * 60_000;
 const VOTE_UNTIL_MS = (DEPLOYMENT_MINUTES - 12) * 60_000; // stop voting with room before the timeout
 const pause = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -77,6 +84,15 @@ const sample = JSON.parse(readFileSync(SAMPLE, 'utf8')) as { prs: SamplePr[]; se
 const VOTES = `${OUT}/votes.jsonl`;
 const readVotes = (): VoteRow[] => (existsSync(VOTES) ? readFileSync(VOTES, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l) as VoteRow) : []);
 
+// The patches the verifiers see, frozen in the repository when the sample was drawn (tasks/patches.jsonl.gz), so every job and every
+// reader sees the same ones. Any not there are read from GitHub.
+if (existsSync(PATCHES)) {
+  for (const l of gunzipSync(readFileSync(PATCHES)).toString('utf8').split('\n').filter(Boolean)) {
+    const { id, patch } = JSON.parse(l) as { id: string; patch: AgentPatch | null };
+    const file = `${CACHE}/${id.replace(/[/#]/g, '_')}.json`;
+    if (!existsSync(file)) writeFileSync(file, JSON.stringify(patch));
+  }
+}
 // Patches first, with nothing running. A PR whose patch can't be read is left out for every verifier alike, and counted.
 const patches = new Map<string, AgentPatch>();
 const unreadable: string[] = [];
@@ -114,6 +130,11 @@ async function worker(v: (typeof verifiers)[number]) {
   while (!stopReason) {
     const todo = remaining(order, readVotes(), v.id);
     if (!todo.length) return log('verifier done', { verifier: v.id });
+    // Under 40 minutes left, a new deployment would spend most of its time starting: hand over instead.
+    if (timeLeft() < 40 * 60_000) {
+      stopReason ??= 'time';
+      return;
+    }
     // One deployment is started at a time, so each check sees the reservations of those before it.
     const next = deployLock.catch(() => undefined).then(async (): Promise<{ id: string } | null> => {
       const s = await spent();
@@ -154,6 +175,10 @@ async function worker(v: (typeof verifiers)[number]) {
       const client = openaiClient({ baseUrl: `${url}/v1`, model: v.model, apiKey: 'none', timeoutMs: 600_000 });
       for (const id of todo) {
         if (stopReason || Date.now() - t0 > VOTE_UNTIL_MS) break;
+        if (timeLeft() < 12 * 60_000) {
+          stopReason ??= 'time';
+          break;
+        }
         const p = byId.get(id)!;
         const a = patches.get(id)!;
         const r = await askRanker(client, p.repo, a.task, a.patch);

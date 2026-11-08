@@ -10,7 +10,8 @@
     "probe": "tsx scripts/probe.mts",
     "sample": "tsx scripts/sample.mts",
     "bench-run": "tsx scripts/run.mts",
-    "gemini-daily": "tsx scripts/gemini-daily.mts"
+    "gemini-daily": "tsx scripts/gemini-daily.mts",
+    "patches": "tsx scripts/patches.mts"
   },
   "devDependencies": {
     "@types/node": "24.10.1",
