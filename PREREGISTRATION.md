@@ -171,3 +171,19 @@ Gemini's free tier allows 20 requests a day, so 1,000 votes would take 50 days. 
 ## What the patches leave out (2026-11-08, a record)
 
 **Patches over 60,000 characters are excluded** (55 PRs: 46 before this amendment, and 9 more whose co-authored patch is longer), as `src/agentPatch.ts` already did. **So results apply to PRs under that size. Large PRs are often the riskiest, and this bench says nothing about them.** Also left out: 16 PRs whose diff is empty, 59 whose commits are a person's with no co-author line naming the agent, and 3 whose co-author line names another agent. 133 in all. Each is left out for every verifier alike, and counted in the report.
+
+## A secondary analysis: cross-file reach (2026-11-08, written before it's computed; not part of 40.10's claim)
+
+**The question:** does a patch's cross-file reach, read statically with no test run, rank the PRs with a strict later-found problem above size alone, and above random?
+
+**Reach, from the frozen patch and the repository at the patch's base commit** (`src/reach.ts`):
+- **The functions it changes:** a public or exported function or class whose definition is on a changed line, or encloses a changed line by the hunk's header. Exported by each language's convention: `export` in TypeScript and JavaScript, a name without a leading underscore at the top level in Python, a capital in Go, `pub` in Rust, `public` in Java, Kotlin, C# and PHP, `def` in Ruby. Names under 4 characters, and a fixed list of common ones, are left out.
+- **Their call sites the patch didn't change:** lines matching the name followed by `(`, as a whole word, in files of the same language that the patch didn't change, by `git grep` at the base commit. At most 500 per name.
+
+**The scores:** **primary, reach:** the number of those call sites. **Secondary, reach then size:** reach, ties broken by changed lines. **Beside them, changed functions:** how many there are.
+
+**The truth and the test:** the strict later-found problem of this pre-registration, on the merged PRs with a readable patch. **Recall at k of 10%, 20% and 30%,** paired against size alone and against random, with the bootstrap over repositories, as the primary results. **Reach adds something only if, at k = 20%, its difference from size has a lower bound above zero.** Reported with and without the co-authored stratum.
+
+**Where it runs:** the later-found problems are read from GitHub, read-only. Reach runs in this repository's Actions, with no secrets and no token. No repository's code runs: it's searched as text.
+
+**Where it's noisy:** a name is matched as text, so another function of the same name counts, and a call through an alias or a method doesn't. Only one commit's tree is searched, not other repositories that import it.
