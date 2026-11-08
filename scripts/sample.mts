@@ -92,5 +92,5 @@ const candidates = (rows.filter((r) => r.kind === 'pr') as Candidate[]).filter((
 const pools: Record<string, { merged: number; closed: number }> = {};
 for (const d of rows.filter((r) => r.kind === 'day')) (pools[d.agent] ??= { merged: 0, closed: 0 })[d.state as 'merged' | 'closed'] += d.pool;
 const s = drawSample(candidates, { seed: SEED, readAt: READ_AT, heldOut });
-writeFileSync('tasks/sample.json', `${JSON.stringify({ seed: SEED, readAt: READ_AT, rules: SAMPLE_RULES, days: [days[0], days.at(-1)], perDay: PER_DAY, pools, counts: s.counts, size: s.drawn.length, prs: s.drawn }, null, 1)}\n`);
+writeFileSync('tasks/sample.json', `${JSON.stringify({ seed: SEED, readAt: READ_AT, rules: SAMPLE_RULES, days: [days[0], days.at(-1)], perDay: { app: PER_DAY(false), note: PER_DAY(true) }, pools, counts: s.counts, size: s.drawn.length, prs: s.drawn }, null, 1)}\n`);
 log('drawn', { size: s.drawn.length, counts: Object.fromEntries(Object.entries(s.counts).map(([k, v]) => [k, `${v.merged}+${v.closed} of ${v.eligible} eligible, ${v.candidates} read`])) });

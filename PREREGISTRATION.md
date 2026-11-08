@@ -125,3 +125,20 @@ The prompt, the tool, the models, thinking at each model's default, and the rule
 Gemini's free tier allows 20 requests a day, so 1,000 votes would take 50 days. **The run goes without Gemini, and arm C is 2 of 3**, as the arms allow when a verifier is removed. Gemini votes 20 PRs a day from the same order, in its own job, with its own Google project's key. Those votes are reported apart and never counted in arm C.
 
 **The sample:** 1,000 PRs at most 170 an agent, independently judged, drawn by `scripts/sample.mts` from GitHub's search day by day, with seed `verify-bench-40.10`. The run walks its order on the three verifiers at once. It is scored on the PRs every verifier answered, and stops at 7.879 Nosana credits (8 in all, with the probe).
+
+## The sample as drawn (2026-11-08, a record, not an amendment; before any sampled PR is voted on)
+
+`scripts/sample.mts` read GitHub on 2026-11-08 at 04:43 UTC, PRs created 2026-09-03 to 2026-10-09. **It drew 880 PRs, not 1,000, by the same rules:** a state short of its quota stays short, and one repository gives at most 25 of an agent's.
+
+| Agent | Read | Eligible | Drawn, merged + closed | Short of 170 | Why short |
+|---|---|---|---|---|---|
+| Copilot coding agent | 11,100 | 904 | 141 + 29 | 0 | |
+| Claude (GitHub app) | 6,780 | 527 | 158 + 12 | 0 | |
+| Devin | 9,878 | 604 | 134 + 36 | 0 | |
+| Cursor (GitHub app) | 9,042 | 526 | 138 + 32 | 0 | |
+| Codex (task link) | 778 | 47 | 32 + 4 | 134 | Few eligible: 679 under 100 stars. 6 repositories |
+| Jules | 8,857 | 82 | 34 + 5 | 131 | 8,343 under 100 stars. The eligible are in 3 repositories, one with 68, capped at 25 |
+| Claude Code (body note) | 22,200 | 247 | 65 + 12 | 93 | 69 eligible merged against a quota of 158. Closed is capped at its share, 12 of 179 |
+| Cursor (agent note) | 22,200 | 64 | 24 + 24 | 122 | 26 eligible merged against a quota of 146 |
+
+726 merged and 154 closed. Mean 228 changed lines, median 90. **Limits of the read:** at most 150 PRs a day and state for an app's account and 300 for a note, newest first, so on busy days the earlier hours aren't read. The notes' pools are far larger than what was read. Codex and Jules are reported as counts, as above. Every count, exclusion and pool is in `tasks/sample.json`, and every PR read is in `tasks/candidates.jsonl.gz`.
