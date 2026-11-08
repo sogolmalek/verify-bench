@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { AGENT_VERIFIERS, broadProblem, codeownersPatterns, quality1, quality2, riskPatternsOf, strictProblem, stripTask, type PrFacts } from '../src/agentPrs.js';
-import { readAgentPatch } from '../src/agentPatch.js';
+import { coAuthoredBy, readAgentPatch } from '../src/agentPatch.js';
 import { answerRoom, askRanker, pCorrect, riskScore } from '../src/rankVerifier.js';
 import { baseRate, crossFittedPoint, precisionCoverageCurve, rankingClaimHolds, recallAt, recallResult, SIZE, thresholdFor, type CurveRow, type RankRow } from '../src/ranking.js';
 import { eligibleVerifiers } from '../src/quorum.js';
@@ -172,6 +172,22 @@ describe("the agent's patch", () => {
   it('stops at the first person, and strips the task', async () => {
     const p = await readAgentPatch('o/r', 1, { fetch: fake([commit('a1', 'claude[bot]', 'Bot'), commit('a2', 'claude[bot]', 'Bot'), commit('p1', 'ana'), commit('a3', 'claude[bot]', 'Bot')]) });
     expect(p).toMatchObject({ agentCommit: 'a2', commitsDropped: 2, patch: 'diff of a2', task: { title: 'Do it', description: 'Do it.' } });
+  });
+  const byPerson = (sha: string, login: string, message: string) => ({ sha, author: { login }, commit: { author: { name: login }, message } });
+  it('amendment 3: a person’s commit with a co-author line naming the PR’s agent is the agent’s, and the PR is co-authored', async () => {
+    const devin = 'Fix it\n\nCo-Authored-By: Devin AI <158243242+devin-ai-integration[bot]@users.noreply.github.com>';
+    const p = await readAgentPatch('o/r', 1, { coAuthor: /devin/i, fetch: fake([byPerson('d1', 'jesus', devin), byPerson('d2', 'jesus', devin), byPerson('p1', 'jesus', 'Tidy')]) });
+    expect(p).toMatchObject({ agentCommit: 'd2', commitsDropped: 1, coAuthored: true });
+    // Another agent's line, or none, doesn't count; without the amendment's pattern the rule is as before.
+    expect(await readAgentPatch('o/r', 1, { coAuthor: /devin/i, fetch: fake([byPerson('c1', 'ana', 'x\n\nCo-authored-by: Claude <noreply@anthropic.com>')]) })).toBeNull();
+    expect(await readAgentPatch('o/r', 1, { fetch: fake([byPerson('d1', 'jesus', devin)]) })).toBeNull();
+    // A bot's own commits aren't co-authored.
+    expect(await readAgentPatch('o/r', 1, { coAuthor: /claude/i, fetch: fake([commit('a1', 'claude[bot]', 'Bot')]) })).toMatchObject({ coAuthored: false });
+  });
+  it('reads a co-author line only as a trailer line naming the agent', () => {
+    expect(coAuthoredBy('x\n\nCo-authored-by: Claude <noreply@anthropic.com>', /\bclaude\b/i)).toBe(true);
+    expect(coAuthoredBy('Asked Claude about it\nCo-authored-by: Ana <a@b.c>', /\bclaude\b/i)).toBe(false);
+    expect(coAuthoredBy('no trailer', /devin/i)).toBe(false);
   });
   it('is null when a person wrote the first commit, or the diff can’t be read', async () => {
     expect(await readAgentPatch('o/r', 1, { fetch: fake([commit('p1', 'ana')]) })).toBeNull();

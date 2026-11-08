@@ -5,21 +5,22 @@
  */
 import { createHash } from 'node:crypto';
 
-export type SampleAgent = { name: string; query: string; vendor: string; secondary: boolean; marker?: RegExp; mergedShare: number };
+/** coAuthor: how a co-author line names the agent (amendment 3). */
+export type SampleAgent = { name: string; query: string; vendor: string; secondary: boolean; marker?: RegExp; mergedShare: number; coAuthor?: RegExp };
 
 /**
  * The agents, how GitHub finds them, and the natural share of merged PRs estimated in the design's counts (pool times usable share).
  * Gemini CLI's note held on 4% of rows, so it isn't an agent signal, and isn't here.
  */
 export const SAMPLE_AGENTS: readonly SampleAgent[] = [
-  { name: 'Copilot coding agent', query: 'author:app/copilot-swe-agent', vendor: 'github', secondary: false, mergedShare: 0.83 },
-  { name: 'Claude (GitHub app)', query: 'author:app/claude', vendor: 'anthropic', secondary: false, mergedShare: 0.93 },
-  { name: 'Devin', query: 'author:app/devin-ai-integration', vendor: 'cognition', secondary: false, mergedShare: 0.79 },
-  { name: 'Cursor (GitHub app)', query: 'author:app/cursor', vendor: 'cursor', secondary: false, mergedShare: 0.81 },
-  { name: 'Codex (task link)', query: '"chatgpt.com/codex/tasks" in:body', vendor: 'openai', secondary: false, marker: /chatgpt\.com\/codex\/tasks/i, mergedShare: 0.64 },
-  { name: 'Jules', query: 'author:app/google-labs-jules', vendor: 'google', secondary: false, mergedShare: 0.24 },
-  { name: 'Claude Code (body note)', query: '"Generated with Claude Code" in:body', vendor: 'anthropic', secondary: true, marker: /claude\.(?:com|ai)\/(?:claude-)?code|Generated with \[?Claude Code/i, mergedShare: 0.93 },
-  { name: 'Cursor (agent note)', query: '"cursor.com/agents" in:body', vendor: 'cursor', secondary: true, marker: /cursor\.com\/(?:agents|background-agent)/i, mergedShare: 0.86 },
+  { name: 'Copilot coding agent', query: 'author:app/copilot-swe-agent', vendor: 'github', secondary: false, mergedShare: 0.83, coAuthor: /copilot/i },
+  { name: 'Claude (GitHub app)', query: 'author:app/claude', vendor: 'anthropic', secondary: false, mergedShare: 0.93, coAuthor: /\bclaude\b/i },
+  { name: 'Devin', query: 'author:app/devin-ai-integration', vendor: 'cognition', secondary: false, mergedShare: 0.79, coAuthor: /devin/i },
+  { name: 'Cursor (GitHub app)', query: 'author:app/cursor', vendor: 'cursor', secondary: false, mergedShare: 0.81, coAuthor: /cursor/i },
+  { name: 'Codex (task link)', query: '"chatgpt.com/codex/tasks" in:body', vendor: 'openai', secondary: false, marker: /chatgpt\.com\/codex\/tasks/i, mergedShare: 0.64, coAuthor: /codex|chatgpt/i },
+  { name: 'Jules', query: 'author:app/google-labs-jules', vendor: 'google', secondary: false, mergedShare: 0.24, coAuthor: /jules/i },
+  { name: 'Claude Code (body note)', query: '"Generated with Claude Code" in:body', vendor: 'anthropic', secondary: true, marker: /claude\.(?:com|ai)\/(?:claude-)?code|Generated with \[?Claude Code/i, mergedShare: 0.93, coAuthor: /\bclaude\b/i },
+  { name: 'Cursor (agent note)', query: '"cursor.com/agents" in:body', vendor: 'cursor', secondary: true, marker: /cursor\.com\/(?:agents|background-agent)/i, mergedShare: 0.86, coAuthor: /cursor/i },
 ];
 
 export const SAMPLE_RULES = { from: '2026-09-03', minStars: 100, maxLines: 2_000, windowDays: 30, perAgent: 170, repoShare: 0.15 } as const;

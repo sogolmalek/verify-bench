@@ -3,16 +3,19 @@
  * Nosana deployment each, every one walking the same order. Deployments last 3 hours and are replaced, and the run resumes from the votes
  * already written. It stops at the credit cap, at the gate, or when every verifier is done, and stops every deployment it started.
  *   NOSANA_API_KEY, GITHUB_TOKEN (read-only), RUN_CAP_CREDITS (default 7.879), RUN_OUT (default results), RUN_MAX_MINUTES (default none:
- *   in Actions, a job stops in time to save its votes and hand over to the next, which resumes)
+ *   in Actions, a job stops in time to save its votes and hand over to the next, which resumes), RUN_PUSH_GATE=1 (in Actions: commits
+ *   results/gate.json as soon as the gate is decided, so its result is readable before the job ends)
  * Gemini isn't here: arm C is 2 of 3 (amendment 2), and its daily side run is scripts/gemini-daily.mts.
  */
+import { execFileSync } from 'node:child_process';
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { gunzipSync } from 'node:zlib';
 import { AGENT_VERIFIERS } from '../src/agentPrs.js';
 import { readAgentPatch, type AgentPatch } from '../src/agentPatch.js';
 import { openaiClient } from '../src/clients.js';
 import { askRanker } from '../src/rankVerifier.js';
-import { canDeploy, commonPrefix, DEPLOYMENT_MINUTES, gateFailure, remaining, RUN_CAP_CREDITS, type VoteRow } from '../src/run.js';
+import { SAMPLE_AGENTS } from '../src/sample.js';
+import { canDeploy, commonPrefix, DEPLOYMENT_MINUTES, GATE_VOTES, gateFailure, remaining, RUN_CAP_CREDITS, type VoteRow } from '../src/run.js';
 
 const API = process.env.RUN_NOSANA_API ?? 'https://api.nosana.com'; // another only for the dry-run test
 const KEY = process.env.NOSANA_API_KEY;
@@ -84,6 +87,35 @@ const sample = JSON.parse(readFileSync(SAMPLE, 'utf8')) as { prs: SamplePr[]; se
 const VOTES = `${OUT}/votes.jsonl`;
 const readVotes = (): VoteRow[] => (existsSync(VOTES) ? readFileSync(VOTES, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l) as VoteRow) : []);
 
+// The gate's result, written once: when every verifier has its first 30 votes, or one fails. In Actions it's committed at once.
+const GATE_FILE = `${OUT}/gate.json`;
+function checkpointGate(ids: readonly string[]) {
+  if (existsSync(GATE_FILE)) return;
+  const rows = readVotes();
+  const failures = ids.map((v) => gateFailure(rows, v)).filter((x): x is string => !!x);
+  const counts = Object.fromEntries(ids.map((v) => {
+    const first = rows.filter((r) => r.verifier === v).slice(0, GATE_VOTES);
+    const missing: Record<string, number> = {};
+    for (const r of first.filter((x) => x.vote === null)) missing[r.error ?? 'unknown'] = (missing[r.error ?? 'unknown'] ?? 0) + 1;
+    return [v, { votes: first.length, missing, accept: first.filter((x) => x.vote === 'accept').length, reject: first.filter((x) => x.vote === 'reject').length, secondsPerVote: first.length ? Math.round(first.reduce((a, x) => a + x.seconds, 0) / first.length) : null }];
+  }));
+  if (!failures.length && Object.values(counts).some((c) => c.votes < GATE_VOTES)) return;
+  writeFileSync(GATE_FILE, `${JSON.stringify({ at: new Date().toISOString(), passed: !failures.length, failures, firstVotes: counts }, null, 1)}\n`);
+  log('gate', { passed: !failures.length, failures });
+  if (!process.env.RUN_PUSH_GATE) return;
+  try {
+    const git = (...a: string[]) => execFileSync('git', a, { stdio: 'ignore' });
+    git('config', 'user.name', 'github-actions[bot]');
+    git('config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com');
+    git('add', GATE_FILE);
+    git('commit', '-m', `The gate: ${failures.length ? 'failed' : 'passed'} after ${GATE_VOTES} votes per verifier`);
+    git('pull', '--rebase', '-q');
+    git('push', '-q');
+  } catch (e) {
+    log('gate push failed', { error: (e as Error).message });
+  }
+}
+
 // The patches the verifiers see, frozen in the repository when the sample was drawn (tasks/patches.jsonl.gz), so every job and every
 // reader sees the same ones. Any not there are read from GitHub.
 if (existsSync(PATCHES)) {
@@ -100,7 +132,7 @@ for (const [i, p] of sample.prs.entries()) {
   const file = `${CACHE}/${p.id.replace(/[/#]/g, '_')}.json`;
   let a: AgentPatch | null = existsSync(file) ? (JSON.parse(readFileSync(file, 'utf8')) as AgentPatch | null) : null;
   if (!existsSync(file)) {
-    a = await readAgentPatch(p.repo, p.number, { ...(process.env.GITHUB_TOKEN ? { token: process.env.GITHUB_TOKEN } : {}) }).catch(() => null);
+    a = await readAgentPatch(p.repo, p.number, { coAuthor: SAMPLE_AGENTS.find((x) => x.name === p.agent)?.coAuthor, ...(process.env.GITHUB_TOKEN ? { token: process.env.GITHUB_TOKEN } : {}) }).catch(() => null);
     writeFileSync(file, JSON.stringify(a));
     await pause(300);
   }
@@ -182,10 +214,11 @@ async function worker(v: (typeof verifiers)[number]) {
         const p = byId.get(id)!;
         const a = patches.get(id)!;
         const r = await askRanker(client, p.repo, a.task, a.patch);
-        appendFileSync(VOTES, `${JSON.stringify({ verifier: v.id, vendor: v.vendor, id, agent: p.agent, state: p.state, lines: p.lines, vote: r.vote, confidence: r.confidence, reason: r.reason, seconds: Math.round(r.seconds * 10) / 10, inputTokens: r.usage.input, outputTokens: r.usage.output, modelReported: r.model, stop: r.stop ?? null, ...(r.error ? { error: r.error } : {}), ...(r.excerpt !== undefined ? { excerpt: r.excerpt } : {}) })}\n`);
+        appendFileSync(VOTES, `${JSON.stringify({ verifier: v.id, vendor: v.vendor, id, agent: p.agent, state: p.state, lines: p.lines, coAuthored: a.coAuthored ?? false, vote: r.vote, confidence: r.confidence, reason: r.reason, seconds: Math.round(r.seconds * 10) / 10, inputTokens: r.usage.input, outputTokens: r.usage.output, modelReported: r.model, stop: r.stop ?? null, ...(r.error ? { error: r.error } : {}), ...(r.excerpt !== undefined ? { excerpt: r.excerpt } : {}) })}\n`);
         votes++;
         const gate = gateFailure(readVotes(), v.id);
         if (gate) stopReason ??= `the gate: ${gate}`;
+        checkpointGate(verifiers.map((x) => x.id));
         if (votes % 10 === 0) {
           const now = await spent().catch(() => null);
           if (now !== null && now > CAP) stopReason ??= `the cap: ${now.toFixed(3)} spent`;

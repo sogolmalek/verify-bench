@@ -142,3 +142,32 @@ Gemini's free tier allows 20 requests a day, so 1,000 votes would take 50 days. 
 | Cursor (agent note) | 22,200 | 64 | 24 + 24 | 122 | 26 eligible merged against a quota of 146 |
 
 726 merged and 154 closed. Mean 228 changed lines, median 90. **Limits of the read:** at most 150 PRs a day and state for an app's account and 300 for a note, newest first, so on busy days the earlier hours aren't read. The notes' pools are far larger than what was read. Codex and Jules are reported as counts, as above. Every count, exclusion and pool is in `tasks/sample.json`, and every PR read is in `tasks/candidates.jsonl.gz`.
+
+## Amendment 3 (2026-11-08, approved by the owner, before any sampled PR is voted on)
+
+**Why:** reading the 880 patches, 126 had every commit authored by a person, so the agent's patch couldn't be told and the PR was left out. 95 of Devin's 170 were among the 189 left out. Devin opens the PR from its own account but often commits as the person who started it. On 64 of the 126, a commit's message has a co-author line naming that PR's agent, and on 3 more it names another agent.
+
+**The rule:** a commit authored by a person counts as the agent's when its message has a co-author line (`Co-authored-by:`) whose name or address names that PR's agent: Copilot, Claude, Devin, Cursor, Codex or ChatGPT, or Jules. Another agent's line, or a mention outside a co-author line, doesn't count. The patch is still the diff at the agent's last commit before any other person's. In `src/agentPatch.ts`, with its test in `test/agentPrs.test.ts`.
+
+**A separate stratum, "co-authored":** a PR whose patch includes such a commit. A person may have written part of it, so **every result is reported with and without the co-authored PRs**, and the person-or-agent ambiguity stays visible. Each vote records `coAuthored`.
+
+**What was re-read:** the PRs with no patch, and the PRs whose patch stopped before a later commit, since only those can change. Every other PR's commits were the agent's already.
+
+**Its effect,** read on 2026-11-08: 56 more PRs have a patch, and 22 patches already read now reach a later co-authored commit. None was lost. **747 of the 880 can be voted on, 78 of them co-authored.**
+
+| Agent | Drawn | A patch before | A patch now | Co-authored |
+|---|---|---|---|---|
+| Copilot coding agent | 170 | 143 | 144 | 14 |
+| Claude (GitHub app) | 170 | 152 | 154 | 6 |
+| Devin | 170 | 75 | 119 | 45 |
+| Cursor (GitHub app) | 170 | 155 | 156 | 4 |
+| Codex (task link) | 36 | 31 | 31 | 0 |
+| Jules | 39 | 37 | 37 | 0 |
+| Claude Code (body note) | 77 | 60 | 68 | 9 |
+| Cursor (agent note) | 48 | 38 | 38 | 0 |
+
+**Devin is the most affected:** 45 of its 119 are co-authored, so its row without them rests on 74 PRs.
+
+## What the patches leave out (2026-11-08, a record)
+
+**Patches over 60,000 characters are excluded** (55 PRs: 46 before this amendment, and 9 more whose co-authored patch is longer), as `src/agentPatch.ts` already did. **So results apply to PRs under that size. Large PRs are often the riskiest, and this bench says nothing about them.** Also left out: 16 PRs whose diff is empty, 59 whose commits are a person's with no co-author line naming the agent, and 3 whose co-author line names another agent. 133 in all. Each is left out for every verifier alike, and counted in the report.

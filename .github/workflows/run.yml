@@ -22,12 +22,13 @@ jobs:
           NOSANA_API_KEY: ${{ secrets.NOSANA_API_KEY }}
           GITHUB_TOKEN: ${{ github.token }}
           RUN_MAX_MINUTES: '320'
+          RUN_PUSH_GATE: '1'
       - name: Commit this job's votes
         if: always()
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add results/votes.jsonl results/run-log.jsonl results/run-report.json results/run-baseline.json 2>/dev/null || true
+          for f in results/votes.jsonl results/run-log.jsonl results/run-report.json results/run-baseline.json results/gate.json; do [ -f "$f" ] && git add "$f"; done
           git diff --cached --quiet || { git commit -m "The run's votes, $(date -u +%FT%H:%MZ)"; git pull --rebase -q; git push; }
       - name: Hand over to the next job, when this one stopped for time
         if: success()

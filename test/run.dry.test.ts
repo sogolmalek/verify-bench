@@ -69,6 +69,10 @@ describe('the run, against fakes', () => {
     expect(state.reserved).toBeCloseTo(0);
     const votes = readFileSync(join(dir, 'out', 'votes.jsonl'), 'utf8').trim().split('\n').map((l) => JSON.parse(l));
     expect(votes.filter((v) => v.verifier === 'devstral').map((v) => v.id)).toEqual(Array.from({ length: 40 }, (_, i) => `o/r#${i + 1}`));
+    // The gate is decided once every verifier has 30 votes, and written then.
+    const gate = JSON.parse(readFileSync(join(dir, 'out', 'gate.json'), 'utf8'));
+    expect(gate).toMatchObject({ passed: true, failures: [] });
+    expect(Object.values(gate.firstVotes).map((v: any) => v.votes)).toEqual([30, 30, 30]);
     // Resuming a finished run starts nothing.
     const before = state.created;
     await go(env);
@@ -81,6 +85,7 @@ describe('the run, against fakes', () => {
     state.answer = 'tool';
     const r = report(dir);
     expect(r.stopped).toMatch(/^the gate: .*missing \(ran out of tokens/);
+    expect(JSON.parse(readFileSync(join(dir, 'out', 'gate.json'), 'utf8'))).toMatchObject({ passed: false });
     expect(state.stopped.size).toBe(state.created);
   }, 120_000);
   it('hands over at its time limit, and the next job resumes where it stopped', async () => {
@@ -94,12 +99,15 @@ describe('the run, against fakes', () => {
     const { gzipSync } = await import('node:zlib');
     const { dir, env } = setup(3);
     const patches = join(dir, 'patches.jsonl.gz');
-    const frozen = [1, 2, 3].map((i) => JSON.stringify({ id: `o/r#${i}`, patch: i === 2 ? null : { task: { title: 'frozen', description: '' }, patch: 'diff', agentCommit: 'a', baseSha: 'b', commitsDropped: 0 } })).join('\n');
+    const frozen = [1, 2, 3].map((i) => JSON.stringify({ id: `o/r#${i}`, patch: i === 2 ? null : { task: { title: 'frozen', description: '' }, patch: 'diff', agentCommit: 'a', baseSha: 'b', commitsDropped: 0, coAuthored: i === 3 } })).join('\n');
     writeFileSync(patches, gzipSync(frozen));
     const cache = join(dir, 'cache2');
     mkdirSync(cache);
     await go({ ...env, RUN_CACHE: cache, RUN_PATCHES: patches });
     expect(report(dir)).toMatchObject({ stopped: 'done', unreadable: 1, scoredOn: 2 });
+    // Each vote carries its PR's stratum (amendment 3).
+    const votes = readFileSync(join(dir, 'out', 'votes.jsonl'), 'utf8').trim().split('\n').map((l) => JSON.parse(l));
+    expect(new Set(votes.filter((v) => v.coAuthored).map((v) => v.id))).toEqual(new Set(['o/r#3']));
   }, 120_000);
   it("doesn't start a deployment the cap can't cover", async () => {
     const { dir, env } = setup(5);
