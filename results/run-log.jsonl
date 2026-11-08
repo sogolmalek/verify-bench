@@ -1,0 +1,39 @@
+{"at":"2026-11-08T17:27:27.598Z","msg":"patches","read":100,"of":880,"unreadable":17}
+{"at":"2026-11-08T17:27:27.605Z","msg":"patches","read":200,"of":880,"unreadable":32}
+{"at":"2026-11-08T17:27:27.610Z","msg":"patches","read":300,"of":880,"unreadable":50}
+{"at":"2026-11-08T17:27:27.617Z","msg":"patches","read":400,"of":880,"unreadable":60}
+{"at":"2026-11-08T17:27:27.625Z","msg":"patches","read":500,"of":880,"unreadable":71}
+{"at":"2026-11-08T17:27:27.629Z","msg":"patches","read":600,"of":880,"unreadable":86}
+{"at":"2026-11-08T17:27:27.634Z","msg":"patches","read":700,"of":880,"unreadable":100}
+{"at":"2026-11-08T17:27:27.640Z","msg":"patches","read":800,"of":880,"unreadable":118}
+{"at":"2026-11-08T17:27:27.645Z","msg":"patches read","sample":880,"readable":747,"unreadable":133}
+{"at":"2026-11-08T17:27:28.640Z","msg":"run starting","sample":880,"readable":747,"cap":7.879,"spentAtStart":0,"verifiers":["qwen3.8:27b","glm-4.7-flash","devstral"]}
+{"at":"2026-11-08T17:27:29.174Z","msg":"deployment started","verifier":"qwen3.8:27b","id":"4d1aRyWLDum8KWBJChBaTHAMiVYSHC9DFMegfHwwSxnt","spent":0}
+{"at":"2026-11-08T17:27:45.450Z","msg":"deployment started","verifier":"glm-4.7-flash","id":"6iaNiVwT47XCx3x2uobz3nXCbH2ZPLF1DzFkVYUBfQCe","spent":0.524}
+{"at":"2026-11-08T17:28:01.790Z","msg":"deployment started","verifier":"devstral","id":"EnN1u5aV3s7yzRJ6eqsmP2WWUFvrX9tjaXvyTe5dtpSe","spent":1.048}
+{"at":"2026-11-08T17:31:54.251Z","msg":"deployment ready","verifier":"qwen3.8:27b","startupSeconds":250.076}
+{"at":"2026-11-08T17:53:01.824Z","msg":"deployment never ready","verifier":"glm-4.7-flash","id":"6iaNiVwT47XCx3x2uobz3nXCbH2ZPLF1DzFkVYUBfQCe"}
+{"at":"2026-11-08T17:53:01.984Z","msg":"deployment stopped","verifier":"glm-4.7-flash","id":"6iaNiVwT47XCx3x2uobz3nXCbH2ZPLF1DzFkVYUBfQCe","votes":0,"minutes":25}
+{"at":"2026-11-08T17:53:02.865Z","msg":"deployment started","verifier":"glm-4.7-flash","id":"ENDqS4gEu5MUxeyFSoGdWyEAnDrbFW3tmKcwy6E7DyX2","spent":1.572}
+{"at":"2026-11-08T17:53:19.256Z","msg":"deployment never ready","verifier":"devstral","id":"EnN1u5aV3s7yzRJ6eqsmP2WWUFvrX9tjaXvyTe5dtpSe"}
+{"at":"2026-11-08T17:53:19.415Z","msg":"deployment stopped","verifier":"devstral","id":"EnN1u5aV3s7yzRJ6eqsmP2WWUFvrX9tjaXvyTe5dtpSe","votes":0,"minutes":25}
+{"at":"2026-11-08T17:53:20.242Z","msg":"deployment started","verifier":"devstral","id":"5wKchF49mFEiLY6cDU8q7qEZmpqDgXyAG627WU4cJRTW","spent":2.096}
+{"at":"2026-11-08T17:55:43.755Z","msg":"deployment ready","verifier":"glm-4.7-flash","startupSeconds":145.89}
+{"at":"2026-11-08T17:58:52.053Z","msg":"deployment never ready","verifier":"devstral","id":"5wKchF49mFEiLY6cDU8q7qEZmpqDgXyAG627WU4cJRTW"}
+{"at":"2026-11-08T17:59:44.666Z","msg":"stop failed","verifier":"devstral","id":"5wKchF49mFEiLY6cDU8q7qEZmpqDgXyAG627WU4cJRTW","error":"POST /api/deployments/5wKchF49mFEiLY6cDU8q7qEZmpqDgXyAG627WU4cJRTW/stop: HTTP 500 {\"error\":\"Deployment is in the incorrect state.\"}"}
+{"at":"2026-11-08T17:59:44.667Z","msg":"deployment stopped","verifier":"devstral","id":"5wKchF49mFEiLY6cDU8q7qEZmpqDgXyAG627WU4cJRTW","votes":0,"minutes":6}
+{"at":"2026-11-08T17:59:46.239Z","msg":"deployment started","verifier":"devstral","id":"Ba5zxW232GiZ2rGWZywyA1jy94g2P6gR7vW2V2osT4os","spent":2.17}
+{"at":"2026-11-08T18:05:39.958Z","msg":"deployment ready","verifier":"devstral","startupSeconds":338.719}
+{"at":"2026-11-08T18:09:50.902Z","msg":"gate","passed":true,"failures":[]}
+{"at":"2026-11-08T19:14:34.198Z","msg":"deployment stopped","verifier":"devstral","id":"Ba5zxW232GiZ2rGWZywyA1jy94g2P6gR7vW2V2osT4os","votes":747,"minutes":75}
+{"at":"2026-11-08T19:14:34.202Z","msg":"verifier done","verifier":"devstral"}
+{"at":"2026-11-08T20:16:37.517Z","msg":"deployment stopped","verifier":"qwen3.8:27b","id":"4d1aRyWLDum8KWBJChBaTHAMiVYSHC9DFMegfHwwSxnt","votes":227,"minutes":169}
+{"at":"2026-11-08T20:16:38.575Z","msg":"deployment started","verifier":"qwen3.8:27b","id":"HEi3X2rM4bSZ3s6MN1it5ouqmKkhDUTyLv33Y13DJgoY","spent":1.4300000000000002}
+{"at":"2026-11-08T20:24:39.574Z","msg":"deployment ready","verifier":"qwen3.8:27b","startupSeconds":465.999}
+{"at":"2026-11-08T20:41:19.187Z","msg":"deployment stopped","verifier":"glm-4.7-flash","id":"ENDqS4gEu5MUxeyFSoGdWyEAnDrbFW3tmKcwy6E7DyX2","votes":609,"minutes":168}
+{"at":"2026-11-08T20:41:20.152Z","msg":"deployment started","verifier":"glm-4.7-flash","id":"DhXGd8B8tvZWScQBHCQGvULdMdEybSyM8N3kgYVvMDEo","spent":1.923}
+{"at":"2026-11-08T20:43:42.250Z","msg":"deployment ready","verifier":"glm-4.7-flash","startupSeconds":127.098}
+{"at":"2026-11-08T21:32:01.293Z","msg":"deployment stopped","verifier":"glm-4.7-flash","id":"DhXGd8B8tvZWScQBHCQGvULdMdEybSyM8N3kgYVvMDEo","votes":138,"minutes":50}
+{"at":"2026-11-08T21:32:01.299Z","msg":"verifier done","verifier":"glm-4.7-flash"}
+{"at":"2026-11-08T22:36:32.722Z","msg":"deployment stopped","verifier":"qwen3.8:27b","id":"HEi3X2rM4bSZ3s6MN1it5ouqmKkhDUTyLv33Y13DJgoY","votes":171,"minutes":140}
+{"at":"2026-11-08T22:36:33.334Z","msg":"run ended","stopped":"time","sample":880,"unreadable":133,"scoredOn":398,"creditsSpent":2.037,"verifiers":{"qwen3.8:27b":{"votes":398,"missing":{"no valid decision":2},"secondsPerVote":44.647738693467375,"medianSeconds":29.6,"deployments":2},"glm-4.7-flash":{"votes":747,"missing":{"HTTP 500":13,"ran out of tokens":12,"no valid decision":4},"secondsPerVote":17.119009370816606,"medianSeconds":10.4,"deployments":3},"devstral":{"votes":747,"missing":{"no valid decision":142},"secondsPerVote":5.472155287817941,"medianSeconds":4.5,"deployments":3}},"deployments":[{"verifier":"glm-4.7-flash","id":"6iaNiVwT47XCx3x2uobz3nXCbH2ZPLF1DzFkVYUBfQCe","startupSeconds":null,"votes":0,"minutes":25.025533333333332},{"verifier":"devstral","id":"EnN1u5aV3s7yzRJ6eqsmP2WWUFvrX9tjaXvyTe5dtpSe","startupSeconds":null,"votes":0,"minutes":25.04371666666667},{"verifier":"devstral","id":"5wKchF49mFEiLY6cDU8q7qEZmpqDgXyAG627WU4cJRTW","startupSeconds":null,"votes":0,"minutes":6.1570833333333335},{"verifier":"devstral","id":"Ba5zxW232GiZ2rGWZywyA1jy94g2P6gR7vW2V2osT4os","startupSeconds":338.719,"votes":747,"minutes":74.54931666666667},{"verifier":"qwen3.8:27b","id":"4d1aRyWLDum8KWBJChBaTHAMiVYSHC9DFMegfHwwSxnt","startupSeconds":250.076,"votes":227,"minutes":168.88903333333334},{"verifier":"glm-4.7-flash","id":"ENDqS4gEu5MUxeyFSoGdWyEAnDrbFW3tmKcwy6E7DyX2","startupSeconds":145.89,"votes":609,"minutes":168.02203333333333},{"verifier":"glm-4.7-flash","id":"DhXGd8B8tvZWScQBHCQGvULdMdEybSyM8N3kgYVvMDEo","startupSeconds":127.098,"votes":138,"minutes":50.43568333333333},{"verifier":"qwen3.8:27b","id":"HEi3X2rM4bSZ3s6MN1it5ouqmKkhDUTyLv33Y13DJgoY","startupSeconds":465.999,"votes":171,"minutes":139.65245}]}
