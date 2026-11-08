@@ -179,6 +179,7 @@ Gemini's free tier allows 20 requests a day, so 1,000 votes would take 50 days. 
 **Reach, from the frozen patch and the repository at the patch's base commit** (`src/reach.ts`):
 - **The functions it changes:** a public or exported function or class whose definition is on a changed line, or encloses a changed line by the hunk's header. Exported by each language's convention: `export` in TypeScript and JavaScript, a name without a leading underscore at the top level in Python, a capital in Go, `pub` in Rust, `public` in Java, Kotlin, C# and PHP, `def` in Ruby. Names under 4 characters, and a fixed list of common ones, are left out.
 - **Their call sites the patch didn't change:** lines matching the name followed by `(`, as a whole word, in files of the same language that the patch didn't change, by `git grep` at the base commit. At most 500 per name.
+- **Corrected before anything was computed (2026-11-08):** in TypeScript and JavaScript, a component's use, `<Name`, is a call site too. A trial on four repositories, with no result kept, showed a changed React component with no `Name(` callers.
 
 **The scores:** **primary, reach:** the number of those call sites. **Secondary, reach then size:** reach, ties broken by changed lines. **Beside them, changed functions:** how many there are.
 

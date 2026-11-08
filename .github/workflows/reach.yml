@@ -1,0 +1,27 @@
+# Cross-file reach (PREREGISTRATION.md, "a secondary analysis"): the sample's repositories at each patch's base commit, searched as
+# text with git grep. No secrets, no token, and no repository's code runs. The results are this run's artifacts.
+name: reach
+on:
+  workflow_dispatch:
+permissions: {}
+jobs:
+  reach:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with: { persist-credentials: false }
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with: { node-version: '24' }
+      - run: npm ci
+      - run: npx tsx scripts/reach.mts
+        env:
+          REACH_SHARD: ${{ matrix.shard }}
+          REACH_SHARDS: '16'
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with: { name: 'reach-${{ matrix.shard }}', path: results/reach/, if-no-files-found: warn }
