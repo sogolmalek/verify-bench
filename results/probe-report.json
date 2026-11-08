@@ -1,0 +1,60 @@
+{
+  "market": "CA5pMpqkYFKtme7K31pNB1s62X2SdhEv1nN9RdxKCpuQ",
+  "priceAssumedPerHour": 0.192,
+  "timeoutMinutes": 60,
+  "before": {
+    "assigned": 10,
+    "reserved": 0,
+    "settled": 0
+  },
+  "after": {
+    "assigned": 10,
+    "reserved": 0,
+    "settled": 0.121
+  },
+  "creditsSpent": 0.121,
+  "models": [
+    {
+      "verifier": "qwen3.8:27b",
+      "model": "qwen3.8:27b",
+      "status": "ran",
+      "startupSeconds": 69.354,
+      "votes": 24,
+      "missing": 6,
+      "secondsPerVote": 54.47949466150002,
+      "medianSeconds": 47.667607917000076,
+      "maxSeconds": 141.065205,
+      "inputTokens": 124006,
+      "outputTokens": 57039,
+      "deployedMinutes": 22.98635
+    },
+    {
+      "verifier": "glm-4.7-flash",
+      "model": "glm-4.7-flash:latest",
+      "status": "ran",
+      "startupSeconds": 109.444,
+      "votes": 24,
+      "missing": 3,
+      "secondsPerVote": 22.131868770958363,
+      "medianSeconds": 20.00480758400005,
+      "maxSeconds": 77.91559929200005,
+      "inputTokens": 111557,
+      "outputTokens": 39503,
+      "deployedMinutes": 10.716733333333334
+    },
+    {
+      "verifier": "devstral",
+      "model": "devstral:latest",
+      "status": "ran",
+      "startupSeconds": 210.874,
+      "votes": 24,
+      "missing": 2,
+      "secondsPerVote": 8.753715441124923,
+      "medianSeconds": 5.730292875000275,
+      "maxSeconds": 49.92459808399994,
+      "inputTokens": 118822,
+      "outputTokens": 2343,
+      "deployedMinutes": 7.1006
+    }
+  ]
+}

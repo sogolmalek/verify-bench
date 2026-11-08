@@ -117,7 +117,7 @@ try {
     let input = 0;
     let output = 0;
     if (url) {
-      const client = openaiClient({ baseUrl: `${url}/v1`, model: v.model, apiKey: 'none', timeoutMs: 300_000 });
+      const client = openaiClient({ baseUrl: `${url}/v1`, model: v.model, apiKey: 'none', timeoutMs: 600_000 });
       const voteStart = Date.now();
       for (const p of prs) {
         const a = patches.get(`${p.repo}#${p.number}`);
@@ -131,7 +131,7 @@ try {
         input += r.usage.input;
         output += r.usage.output;
         if (r.vote === null) missing++;
-        appendFileSync(`${OUT}/probe-votes.jsonl`, `${JSON.stringify({ verifier: v.id, vendor: v.vendor, agent: p.agent, pr: `${p.repo}#${p.number}`, lines: p.lines, heldOutAs: p.heldOutAs, vote: r.vote, confidence: r.confidence, reason: r.reason, seconds: Math.round(r.seconds * 10) / 10, inputTokens: r.usage.input, outputTokens: r.usage.output, modelReported: r.model, ...(r.error ? { error: r.error } : {}) })}\n`);
+        appendFileSync(`${OUT}/probe-votes.jsonl`, `${JSON.stringify({ verifier: v.id, vendor: v.vendor, agent: p.agent, pr: `${p.repo}#${p.number}`, lines: p.lines, heldOutAs: p.heldOutAs, vote: r.vote, confidence: r.confidence, reason: r.reason, seconds: Math.round(r.seconds * 10) / 10, inputTokens: r.usage.input, outputTokens: r.usage.output, modelReported: r.model, ...(r.error ? { stop: r.stop ?? null, error: r.error, ...(r.excerpt !== undefined ? { excerpt: r.excerpt } : {}) } : {}) })}\n`);
         log('vote', { verifier: v.id, n: seconds.length, seconds: Math.round(r.seconds), vote: r.vote });
       }
     }

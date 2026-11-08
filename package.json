@@ -4,7 +4,21 @@
   "private": true,
   "type": "module",
   "license": "MIT",
-  "scripts": { "test": "vitest run", "typecheck": "tsc --noEmit", "probe": "tsx scripts/probe.mts" },
-  "devDependencies": { "@types/node": "24.10.1", "tsx": "4.23.15", "typescript": "5.9.3", "vitest": "5.0.5" },
-  "engines": { "node": ">=22" }
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "probe": "tsx scripts/probe.mts",
+    "sample": "tsx scripts/sample.mts",
+    "bench-run": "tsx scripts/run.mts",
+    "gemini-daily": "tsx scripts/gemini-daily.mts"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.1",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3",
+    "vitest": "5.0.5"
+  },
+  "engines": {
+    "node": ">=22"
+  }
 }

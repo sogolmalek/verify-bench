@@ -110,3 +110,18 @@ For PRs that looked clean, in this order:
 ## The stop rule
 
 The probe first. It reports seconds per vote and the credits spent, then stops. The sample is set from it. Every count, exclusion, interval and the spend is reported in any case.
+
+## Amendment 1 (2026-11-08, approved by the owner, after the probe, before any sampled PR is voted on)
+
+The probe's 11 missing votes were all answers without a valid decision. 9 stopped at the 4,000-token limit, which a thinking model's reasoning counts toward. The server ignores `tool_choice`, so a model can answer in text. In `src/rankVerifier.ts`:
+- The answer's limit is 16,000 tokens, or less where the 32,768-token context requires. A PR leaving under 4,000 is counted as too long, for every verifier.
+- An answer in the text counts when it holds a decision, in any of the forms the tests list. Prose without one is still a missing vote.
+- A missing vote records why.
+
+The prompt, the tool, the models, thinking at each model's default, and the rule that a missing vote is missing are unchanged.
+
+## Amendment 2 (2026-11-08, approved by the owner, before any sampled PR is voted on)
+
+Gemini's free tier allows 20 requests a day, so 1,000 votes would take 50 days. **The run goes without Gemini, and arm C is 2 of 3**, as the arms allow when a verifier is removed. Gemini votes 20 PRs a day from the same order, in its own job, with its own Google project's key. Those votes are reported apart and never counted in arm C.
+
+**The sample:** 1,000 PRs at most 170 an agent, independently judged, drawn by `scripts/sample.mts` from GitHub's search day by day, with seed `verify-bench-40.10`. The run walks its order on the three verifiers at once. It is scored on the PRs every verifier answered, and stops at 7.879 Nosana credits (8 in all, with the probe).

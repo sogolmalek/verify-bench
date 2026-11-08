@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { AGENT_VERIFIERS, broadProblem, codeownersPatterns, quality1, quality2, riskPatternsOf, strictProblem, stripTask, type PrFacts } from '../src/agentPrs.js';
 import { readAgentPatch } from '../src/agentPatch.js';
-import { askRanker, pCorrect, riskScore } from '../src/rankVerifier.js';
+import { answerRoom, askRanker, pCorrect, riskScore } from '../src/rankVerifier.js';
 import { baseRate, crossFittedPoint, precisionCoverageCurve, rankingClaimHolds, recallAt, recallResult, SIZE, thresholdFor, type CurveRow, type RankRow } from '../src/ranking.js';
 import { eligibleVerifiers } from '../src/quorum.js';
 
@@ -70,6 +70,37 @@ describe('a vote', () => {
   it('no valid decision, or an error after its retry, is a missing vote', async () => {
     expect(await askRanker(client({ decision: 'maybe' }), 'o/r', { title: 't', description: '' }, 'diff')).toMatchObject({ vote: null, error: 'no valid decision' });
     expect(await askRanker({ call: async () => { throw new Error('boom'); } }, 'o/r', { title: 't', description: '' }, 'diff')).toMatchObject({ vote: null, error: 'boom' });
+  });
+  // The probe's 11 missing votes (2026-11-07): 9 stopped at the 4,000-token limit while thinking; Ollama ignores tool_choice, so text answers count.
+  const raw = (text: string, stop: string | null = 'stop', calls: { name: string; args: Record<string, unknown> }[] = []) => {
+    const seen: number[] = [];
+    return { seen, client: { call: async (r: { maxTokens: number }) => (seen.push(r.maxTokens), { text, toolCalls: calls.map((c, i) => ({ id: String(i), ...c })), usage: { input: 10, output: 5, cachedInput: 0, cacheWrite: 0 }, model: 'm', id: null, stop, callRef: null }) } };
+  };
+  const ask = (c: { call: (r: any) => Promise<any> }, patch = 'diff') => askRanker(c as any, 'o/r', { title: 't', description: '' }, patch);
+  it('reads an answer written in text, in the forms open-weight servers use', async () => {
+    expect(await ask(raw('[TOOL_CALLS]decide[ARGS]{"decision": "accept", "confidence": 80, "reason": "fine"}').client)).toMatchObject({ vote: 'accept', confidence: 80 });
+    expect(await ask(raw('```json\n{"name": "decide", "arguments": {"decision": "Reject", "confidence": 30, "reason": "off by one"}}\n```').client)).toMatchObject({ vote: 'reject', reason: 'off by one' });
+    expect(await ask(raw('{"name":"decide","arguments":"{\\"decision\\":\\"accept\\",\\"confidence\\":70,\\"reason\\":\\"ok\\"}"}').client)).toMatchObject({ vote: 'accept', confidence: 70 });
+    // Code in the reason with braces, and a first draft before the answer: the last object with a decision wins.
+    expect(await ask(raw('Draft: {"decision":"accept"} then, on reflection: {"decision":"REJECT","confidence":10,"reason":"if (x) { y } is wrong"}').client)).toMatchObject({ vote: 'reject', confidence: 10 });
+    expect(await ask(raw('', 'stop', [{ name: 'decide', args: { decision: 'Accept', confidence: 60, reason: 'r' } }]).client)).toMatchObject({ vote: 'accept' });
+  });
+  it('prose with no decision is still missing, and says which kind', async () => {
+    expect(await ask(raw('I would accept this patch, it looks fine.').client)).toMatchObject({ vote: null, error: 'no valid decision', excerpt: 'I would accept this patch, it looks fine.' });
+    expect(await ask(raw('', 'length').client)).toMatchObject({ vote: null, error: 'ran out of tokens', stop: 'length' });
+  });
+  it('gives the answer 16,000 tokens, less where the context would overflow, and never cuts a prompt', async () => {
+    const small = raw('{"decision":"accept","confidence":90,"reason":"x"}');
+    await ask(small.client);
+    expect(small.seen).toEqual([16_000]);
+    const big = raw('{"decision":"accept","confidence":90,"reason":"x"}');
+    await ask(big.client, 'x'.repeat(3 * 20_000));
+    expect(big.seen[0]).toBeGreaterThanOrEqual(4_000);
+    expect(big.seen[0]! + Math.ceil((3 * 20_000) / 3)).toBeLessThanOrEqual(32_768);
+    const huge = raw('{"decision":"accept"}');
+    expect(await ask(huge.client, 'x'.repeat(3 * 30_000))).toMatchObject({ vote: null, error: 'too long for the context' });
+    expect(huge.seen).toEqual([]);
+    expect(answerRoom('short')).toBe(16_000);
   });
   it('the vote sets the side, and the ranking takes the mean of the votes cast', () => {
     expect(pCorrect({ vote: 'accept', confidence: 20 })).toBe(0.5);
