@@ -1,17 +1,17 @@
 {
- "stopped": "time",
+ "stopped": "done",
  "sample": 880,
  "unreadable": 133,
- "scoredOn": 398,
- "creditsSpent": 2.037,
+ "scoredOn": 747,
+ "creditsSpent": 2.938,
  "verifiers": {
   "qwen3.8:27b": {
-   "votes": 398,
+   "votes": 747,
    "missing": {
-    "no valid decision": 2
+    "no valid decision": 5
    },
-   "secondsPerVote": 44.647738693467375,
-   "medianSeconds": 29.6,
+   "secondsPerVote": 44.21552878179388,
+   "medianSeconds": 28.9,
    "deployments": 2
   },
   "glm-4.7-flash": {
@@ -23,7 +23,7 @@
    },
    "secondsPerVote": 17.119009370816606,
    "medianSeconds": 10.4,
-   "deployments": 3
+   "deployments": 0
   },
   "devstral": {
    "votes": 747,
@@ -32,65 +32,23 @@
    },
    "secondsPerVote": 5.472155287817941,
    "medianSeconds": 4.5,
-   "deployments": 3
+   "deployments": 0
   }
  },
  "deployments": [
   {
-   "verifier": "glm-4.7-flash",
-   "id": "6iaNiVwT47XCx3x2uobz3nXCbH2ZPLF1DzFkVYUBfQCe",
-   "startupSeconds": null,
-   "votes": 0,
-   "minutes": 25.025533333333332
-  },
-  {
-   "verifier": "devstral",
-   "id": "EnN1u5aV3s7yzRJ6eqsmP2WWUFvrX9tjaXvyTe5dtpSe",
-   "startupSeconds": null,
-   "votes": 0,
-   "minutes": 25.04371666666667
-  },
-  {
-   "verifier": "devstral",
-   "id": "5wKchF49mFEiLY6cDU8q7qEZmpqDgXyAG627WU4cJRTW",
-   "startupSeconds": null,
-   "votes": 0,
-   "minutes": 6.1570833333333335
-  },
-  {
-   "verifier": "devstral",
-   "id": "Ba5zxW232GiZ2rGWZywyA1jy94g2P6gR7vW2V2osT4os",
-   "startupSeconds": 338.719,
-   "votes": 747,
-   "minutes": 74.54931666666667
+   "verifier": "qwen3.8:27b",
+   "id": "9PeTisDX5bGkSHVoF2hzZvNfaVLTQL8hLPDskaz5wSwy",
+   "startupSeconds": 232.948,
+   "votes": 217,
+   "minutes": 168.93653333333333
   },
   {
    "verifier": "qwen3.8:27b",
-   "id": "4d1aRyWLDum8KWBJChBaTHAMiVYSHC9DFMegfHwwSxnt",
-   "startupSeconds": 250.076,
-   "votes": 227,
-   "minutes": 168.88903333333334
-  },
-  {
-   "verifier": "glm-4.7-flash",
-   "id": "ENDqS4gEu5MUxeyFSoGdWyEAnDrbFW3tmKcwy6E7DyX2",
-   "startupSeconds": 145.89,
-   "votes": 609,
-   "minutes": 168.02203333333333
-  },
-  {
-   "verifier": "glm-4.7-flash",
-   "id": "DhXGd8B8tvZWScQBHCQGvULdMdEybSyM8N3kgYVvMDEo",
-   "startupSeconds": 127.098,
-   "votes": 138,
-   "minutes": 50.43568333333333
-  },
-  {
-   "verifier": "qwen3.8:27b",
-   "id": "HEi3X2rM4bSZ3s6MN1it5ouqmKkhDUTyLv33Y13DJgoY",
-   "startupSeconds": 465.999,
-   "votes": 171,
-   "minutes": 139.65245
+   "id": "b65smrj3x1CqkQv5qbon9iD4ECycwsRAmwcZF4PQLcx",
+   "startupSeconds": 126.811,
+   "votes": 132,
+   "minutes": 91.84291666666667
   }
  ]
 }
