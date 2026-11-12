@@ -13,3 +13,8 @@
 {"id":"lidge-ai/ima2-gen#321","agent":"Devin","day":"2026-11-10","vote":null,"error":"patch not readable"}
 {"id":"dotnet/runtime#134307","agent":"Copilot coding agent","day":"2026-11-10","vote":null,"error":"patch not readable"}
 {"id":"serverless/serverless#13902","agent":"Cursor (GitHub app)","state":"merged","lines":129,"day":"2026-11-10","vote":null,"confidence":null,"reason":null,"seconds":3.4,"inputTokens":0,"outputTokens":0,"modelReported":null,"stop":null,"error":"HTTP 503"}
+{"id":"langgenius/dify-plugins#3027","agent":"Claude Code (body note)","state":"closed","lines":0,"day":"2026-11-12","vote":null,"confidence":null,"reason":null,"seconds":324.4,"inputTokens":0,"outputTokens":0,"modelReported":null,"stop":null,"error":"fetch failed"}
+{"id":"firecrawl/firecrawl#4895","agent":"Claude (GitHub app)","state":"merged","lines":325,"day":"2026-11-12","vote":null,"confidence":null,"reason":null,"seconds":2.2,"inputTokens":0,"outputTokens":0,"modelReported":null,"stop":null,"error":"HTTP 503"}
+{"id":"BerriAI/litellm#41128","agent":"Devin","day":"2026-11-12","vote":null,"error":"patch not readable"}
+{"id":"abaplint/transpiler#1862","agent":"Claude Code (body note)","state":"merged","lines":36,"day":"2026-11-12","vote":null,"confidence":null,"reason":null,"seconds":3.2,"inputTokens":0,"outputTokens":0,"modelReported":null,"stop":null,"error":"HTTP 503"}
+{"id":"NVIDIA/elements#356","agent":"Cursor (GitHub app)","state":"merged","lines":90,"day":"2026-11-12","vote":null,"confidence":null,"reason":null,"seconds":3.9,"inputTokens":0,"outputTokens":0,"modelReported":null,"stop":null,"error":"HTTP 503"}
